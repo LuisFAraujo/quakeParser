@@ -1,7 +1,7 @@
 package est.estagio.models;
 import est.estagio.models.Player;
 import java.util.List;
-
+import java.util.ArrayList;
 public class Game {
 
     private String name;
@@ -28,9 +28,19 @@ public class Game {
         return players;
     }
 
-    public Game(String name, int totalKills, List<Player> players) {
-        this.name = name;
-        this.totalKills = totalKills;
+    public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public Game() {
+        this.name = "";
+        this.totalKills = 0;
+        this.players = null;
+    }
+    //Iniciar o jogo Nome: game_X
+    public Game startGame(int num) {
+        this.setName("game_"+num);
+        this.setPlayers(new ArrayList<>());
+        return this;
     }
 }
