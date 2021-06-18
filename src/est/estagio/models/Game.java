@@ -43,4 +43,14 @@ public class Game {
         this.setPlayers(new ArrayList<>());
         return this;
     }
+    @Override
+    public String toString() {
+        return  name +": {"+ "\n"+
+                "     total_kills:" + totalKills + "\n"+
+                "     players: " + players + ""+"\n"+
+                "     kills: {" + "\n" +
+                 "        }"+"\n"+
+                "}\n";
+
+    }
 }

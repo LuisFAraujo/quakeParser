@@ -28,4 +28,9 @@ public class Player {
 
         this.kills = kills;
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }
