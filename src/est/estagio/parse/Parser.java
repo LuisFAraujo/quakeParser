@@ -9,14 +9,14 @@ import est.estagio.models.Game;
 public class Parser {
 
 
-    public static void start() {
+    public static void start(int op) {
 
         try {
             List<Game> games = new ArrayList<>();
+            ParserFunctions pF = new ParserFunctions();
             File info = new File("C:\\Users\\LP\\IdeaProjects\\quakeParser\\src\\est\\estagio\\games.log");
             Scanner file = new Scanner(info);
             int contGames=1;
-            int contPlayers =0;
 
             while(file.hasNext()) {
                 String buffer = file.nextLine();
@@ -29,31 +29,25 @@ public class Parser {
                 //Se encontrar Shutdown: Incrementar o contador de jogos e zerar a qtd de players
                 else if (buffer.contains("ShutdownGame")) {
                     contGames=contGames+1;
-                    contPlayers = 0;
                 }
 
                 /*Se encontrar ClientUserInfoChanged: Tratar a informaçao, Criar/Alterar o jogador
                  e adicionar na lista de players */
                 else if(buffer.contains("ClientUserinfoChanged")) {
-                    //Tratamento da linha para encontrar o nome do jogador
-                    String[] tratamento = buffer.split("n\\\\");
-                    String[] tratamento2 = tratamento[1].split("\\\\t");
-                    String playerName = tratamento2[0];
-                    //Fim do tratamento
 
-                    Player newPlayer = new Player(playerName);
+                    String playerName = pF.treatName(buffer);
+                    int idPlayer = pF.treatId(buffer);
+                    Player newPlayer = new Player(playerName,idPlayer);
                     Game playingGame = games.get(contGames-1);
+                    // se a lista de players do jogo estiver vazia, adicionar direto na lista
                     if(playingGame.getPlayers().isEmpty()){
                         playingGame.getPlayers().add(newPlayer);
-                    } else {
-                        int contador =0;
-                        boolean add = true;
-                        while(contador<playingGame.getPlayers().size()) {
-                            if(playingGame.getPlayers().get(contador).getName().equals(playerName)){
-                                add = false;
-                            }
-                            contador++;
-                        }
+                    }
+                    // se a lista de players nao estiver vazia, checar se o player ja existe
+                    else {
+
+                        boolean add = pF.buscarPlayer(playingGame,playerName);
+                        // se o player nao existir, adicionar na lista
                         if(add) {
                             playingGame.getPlayers().add(newPlayer);
                         }
@@ -61,9 +55,34 @@ public class Parser {
                     }
 
                 }
+                /*Se encontrar Kill: Tratar as informaçoes de quem matou e morreu e adicionar ao respectivo player */
+                else if(buffer.contains("Kill")){
+                        String[] kills = pF.treatKill(buffer);
+                        Game g = games.get(contGames-1);
+                        if(kills[1].equals("1022")){
+                            Player morreu = pF.findPlayerById(kills[2],g);
+                            if(morreu.getKills()!=0) {
+                                morreu.setKills(morreu.getKills()-1);
+                            }
+
+                            g.setTotalKills(g.getTotalKills()+1);
+                        } else {
+                            Player matou = pF.findPlayerById(kills[1],g);
+                            matou.setKills(matou.getKills()+1);
+                            g.setTotalKills(g.getTotalKills()+1);
+                        }
+
+                }
 
             }
             file.close();
+            if(op==0) {
+                games.forEach((n) -> n.printGame());
+            } else if(op>games.size()) {
+                System.out.println("Jogo não Existe!");
+            } else {
+                games.get(op-1).printGame();
+            }
 
         } catch (FileNotFoundException e) {
             System.out.println("File not found / Arquivo nao encontrado.");

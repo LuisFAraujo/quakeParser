@@ -43,14 +43,16 @@ public class Game {
         this.setPlayers(new ArrayList<>());
         return this;
     }
-    @Override
-    public String toString() {
-        return  name +": {"+ "\n"+
-                "     total_kills:" + totalKills + "\n"+
-                "     players: " + players + ""+"\n"+
-                "     kills: {" + "\n" +
-                 "        }"+"\n"+
-                "}\n";
+
+
+    public void  printGame() {
+        System.out.println(name +": {");
+        System.out.println("     total_kills:"+totalKills);
+        System.out.println("     players: "+players);
+        System.out.println("     kills: {");
+        players.forEach( (n) -> System.out.println("            \""+n.getName()+"\":"+n.getKills()+","));
+        System.out.println("           }");
+        System.out.println("}");
 
     }
 }
