@@ -37,6 +37,7 @@ public class Parser {
 
                     String playerName = pF.treatName(buffer);
                     int idPlayer = pF.treatId(buffer);
+
                     Player newPlayer = new Player(playerName,idPlayer);
                     Game playingGame = games.get(contGames-1);
                     // se a lista de players do jogo estiver vazia, adicionar direto na lista
@@ -59,14 +60,18 @@ public class Parser {
                 else if(buffer.contains("Kill")){
                         String[] kills = pF.treatKill(buffer);
                         Game g = games.get(contGames-1);
+                        // caso o jogador que matou for o <world>(1022) diminuir kill do player que morreu
                         if(kills[1].equals("1022")){
                             Player morreu = pF.findPlayerById(kills[2],g);
+                            //checar se a kill do player é 0 para não ficar kill negativa
                             if(morreu.getKills()!=0) {
                                 morreu.setKills(morreu.getKills()-1);
                             }
 
                             g.setTotalKills(g.getTotalKills()+1);
-                        } else {
+                        }
+                        // se não for o <world> que matou, achar o player q matou e dar +1 kill
+                        else {
                             Player matou = pF.findPlayerById(kills[1],g);
                             matou.setKills(matou.getKills()+1);
                             g.setTotalKills(g.getTotalKills()+1);
